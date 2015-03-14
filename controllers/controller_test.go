@@ -7,10 +7,11 @@ import (
 
 func Setup() *AdController {
 	testhelper.ResetDB()
+	testhelper.SeedDB()
 	return NewAdController(testhelper.NewAdRepository())
 }
 
-func TestFindAdReturnsAd(t *testing.T) {
+func TestFindAdReturnsMostPrioritizedAd(t *testing.T) {
 	controller := Setup()
 	ad := controller.FindAd("1")
 	if ad.ZoneField != "1" {

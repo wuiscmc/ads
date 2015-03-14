@@ -12,8 +12,20 @@ func getDBSession() *sql.DB {
 	return db
 }
 
+func SeedDB() {
+	db := getDBSession()
+	defer db.Close()
+	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "1", "title1", "description1", 8, 1)
+	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "2", "title2", "description2", 9, 1)
+	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "3", "title3", "description3", 10, 1)
+	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "4", "title4", "description4", 10, 2)
+	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "5", "title5", "description5", 9, 3)
+	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "6", "title6", "description6", 8, 2)
+}
+
 func ResetDB() {
 	db := getDBSession()
+	defer db.Close()
 	db.Exec("DELETE FROM impressions")
 	db.Exec("DELETE FROM ads")
 }
@@ -32,6 +44,7 @@ type Impression struct {
 
 func ListImpressions() []Impression {
 	db := getDBSession()
+	defer db.Close()
 	rows, _ := db.Query("SELECT * FROM impressions")
 	var impressions []Impression
 	for rows.Next() {
