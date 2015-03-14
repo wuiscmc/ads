@@ -1,0 +1,43 @@
+<VAST version="2.0">
+    <Ad id="{{ .Id }}" >
+        <InLine>
+            <AdSystem version="2.0.0">
+                <![CDATA[ AdService deluxe ]]>
+            </AdSystem>
+            <AdTitle>
+              <![CDATA[ {{ .Title }} ]]>
+            </AdTitle>
+            <Impression id="AT">
+                <![CDATA[ http://service.host.com/trk?uid=adId&action=videoClientSideImpression ]]>
+            </Impression>
+            <Creatives>
+                <Creative id="adId" sequence="1">
+                    <Linear>
+                        <Duration/>
+                        <MediaFiles>
+                            <MediaFile width="720" height="405" delivery="progressive" type="video/mp4">
+                                <![CDATA[ http://ad-videos.host.com/videos/fjwoSBMl-Rulr1JTS.mp4 ]]>
+                            </MediaFile>
+                            <MediaFile width="480" height="270" delivery="progressive" type="video/mp4">
+                                <![CDATA[ http://ad-videos.host.com/videos/fjwoSBMl-txLFvXgw.mp4 ]]>
+                            </MediaFile>
+                        </MediaFiles>
+                        <TrackingEvents>
+                            <Tracking event="start">
+                                <![CDATA[ http://service.host.com/trk?uid=adId&action=start ]]>
+                            </Tracking>
+                            <Tracking event="complete">
+                                <![CDATA[ http://service.host.com/trk?uid=adId&action=complete ]]>
+                            </Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough>
+                                <![CDATA[ http://service.host.com/clk?uid=adId&action=videoClickThrough ]]>
+                            </ClickThrough>
+                        </VideoClicks>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>
