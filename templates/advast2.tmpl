@@ -11,7 +11,7 @@
                 <![CDATA[ {{ .Host }}/track?uid={{ .Id }}&action=videoClientSideImpression ]]>
             </Impression>
             <Creatives>
-                <Creative id="adId" sequence="1">
+                <Creative id="{{ .Id }}" sequence="1">
                     <Linear>
                         <Duration/>
                         <MediaFiles>
