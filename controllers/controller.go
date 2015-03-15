@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/wuiscmc/ads/models"
 	"github.com/wuiscmc/ads/repositories"
+	"strconv"
 )
 
 type AdController struct {
@@ -10,12 +11,13 @@ type AdController struct {
 	*repositories.EventRepository
 }
 
-func NewAdController(ar *repositories.AdRepository) *AdController {
-	return &AdController{ar, &repositories.EventRepository{}}
+func NewAdController() *AdController {
+	return &AdController{&repositories.AdRepository{}, &repositories.EventRepository{}}
 }
 
 func (ac AdController) FindAd(zoneId string) models.Ad {
-	ad := ac.AdRepository.FetchAd(zoneId)
+	zone, _ := strconv.Atoi(zoneId)
+	ad := ac.AdRepository.FetchAd(zone)
 	ac.AdRepository.LogImpression(ad.Id)
 	return ad
 }

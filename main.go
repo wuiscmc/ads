@@ -4,7 +4,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/wuiscmc/ads/controllers"
 	"github.com/wuiscmc/ads/models"
-	"github.com/wuiscmc/ads/repositories"
 	"log"
 	"net/http"
 	"os"
@@ -21,23 +20,23 @@ type Response struct {
 func main() {
 
 	router := httprouter.New()
-	adRepository := repositories.NewAdRepository()
-	adController := controllers.NewAdController(adRepository)
+	adController := controllers.NewAdController()
 
 	router.GET(v1("/ads/:zoneId"), func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		logRequest(r)
 		ad := adController.FindAd(ps.ByName("zoneId"))
 		tmpl, _ := template.ParseFiles("templates/advast2.tmpl")
 		w.Header().Set("Content-Type", "application/xml")
-		tmpl.Execute(w, Response{ad, string("http://localhost:3000")})
+		tmpl.Execute(w, Response{ad, string("http://localhost:3000/v1")})
 	})
 
-	router.POST("/track", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	router.POST(v1("/track"), func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		logRequest(r)
 		query := r.URL.Query()
-		id := query.Get("id")
+		id := query.Get("uid")
 		action := query.Get("action")
 		adController.TrackEvent(id, action)
+		w.WriteHeader(204)
 	})
 	http.ListenAndServe(":3000", router)
 }
