@@ -21,7 +21,8 @@ type Response struct {
 func main() {
 
 	router := httprouter.New()
-	adController := controllers.NewAdController(repositories.NewAdRepository())
+	adRepository := repositories.NewAdRepository()
+	adController := controllers.NewAdController(adRepository)
 
 	router.GET(v1("/ads/:zoneId"), func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		logRequest(r)
@@ -33,10 +34,10 @@ func main() {
 
 	router.POST("/track", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		logRequest(r)
-		id := r.URL.Get("id")
-		action := r.URL.Get("action")
-		ad := adController.TrackEvent(id, action)
-		w.Write(204)
+		query := r.URL.Query()
+		id := query.Get("id")
+		action := query.Get("action")
+		adController.TrackEvent(id, action)
 	})
 	http.ListenAndServe(":3000", router)
 }
