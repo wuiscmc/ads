@@ -15,9 +15,11 @@
                     <Linear>
                         <Duration/>
                         <MediaFiles>
-                            <MediaFile width="720" height="405" delivery="progressive" type="video/mp4">
-                                <![CDATA[ http://ad-videos.host.com/videos/fjwoSBMl-Rulr1JTS.mp4 ]]>
+                            {{range $media := .MediaFiles}}
+                            <MediaFile width="{{ $media.Width }}" height="{{ $media.Height }}" delivery="{{ $media.Delivery }}" type="{{ $media.Type }}">
+                                <![CDATA[ {{ $media.Url }} ]]>
                             </MediaFile>
+                            {{end}}
                         </MediaFiles>
                         <TrackingEvents>
                             <Tracking event="start">
@@ -29,7 +31,7 @@
                         </TrackingEvents>
                         <VideoClicks>
                             <ClickThrough>
-                                <![CDATA[ {{ .Host }}clk?uid={{ .Id }}&action=videoClickThrough ]]>
+                                <![CDATA[ {{ .Host }}/clk?uid={{ .Id }}&action=videoClickThrough ]]>
                             </ClickThrough>
                         </VideoClicks>
                     </Linear>
