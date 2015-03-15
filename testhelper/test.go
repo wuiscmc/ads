@@ -15,17 +15,17 @@ func getDBSession() *sql.DB {
 func SeedDB() {
 	db := getDBSession()
 	defer db.Close()
-	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "1", "title1", "description1", 8, 1)
-	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "2", "title2", "description2", 9, 1)
-	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "3", "title3", "description3", 10, 1)
-	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "4", "title4", "description4", 10, 2)
-	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "5", "title5", "description5", 9, 3)
+	db.Exec("INSERT INTO ads VALUES (?,?,?,?,?)", "1", "title1", "description1", 8, 1)
+	db.Exec("INSERT INTO ads VALUES (?,?,?,?,?)", "2", "title2", "description2", 9, 1)
+	db.Exec("INSERT INTO ads VALUES (?,?,?,?,?)", "3", "title3", "description3", 10, 1)
+	db.Exec("INSERT INTO ads VALUES (?,?,?,?,?)", "4", "title4", "description4", 10, 2)
+	db.Exec("INSERT INTO ads VALUES (?,?,?,?,?)", "5", "title5", "description5", 9, 3)
 }
 
 func CreateAd(id string, title string, desc string, prio int, zone int) {
 	db := getDBSession()
 	defer db.Close()
-	db.Exec("insert into ads values (?,?,?,?,?)", id, title, desc, prio, zone)
+	db.Exec("INSERT INTO ads VALUES (?,?,?,?,?)", id, title, desc, prio, zone)
 }
 
 func ResetDB() {
