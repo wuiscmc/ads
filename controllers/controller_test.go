@@ -5,24 +5,24 @@ import (
 	"testing"
 )
 
-func Setup() *AdController {
+func setup() *AdController {
 	testhelper.ResetDB()
-	return NewAdController(testhelper.NewAdRepository())
+	return NewAdController()
 }
 
 func TestFindAdReturnsMostPrioritizedAd(t *testing.T) {
-	controller := Setup()
-	testhelper.CreateAd("1", "a", "d", 10, 1)
-	testhelper.CreateAd("2", "b", "d", 11, 1)
+	controller := setup()
+	testhelper.CreateAd("1", "d", 10, 1)
+	testhelper.CreateAd("expected", "d", 11, 1)
 	ad := controller.FindAd("1")
-	if ad.Id != "2" {
+	if ad.Title != "expected" {
 		t.Error("ERROR")
 	}
 }
 
 func TestFindAdRecordsImpression(t *testing.T) {
-	controller := Setup()
-	testhelper.CreateAd("1", "a", "d", 10, 1)
+	controller := setup()
+	testhelper.CreateAd("a", "d", 10, 1)
 	controller.FindAd("1")
 	controller.FindAd("1")
 	impressions := testhelper.ListImpressions()

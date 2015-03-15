@@ -2,43 +2,30 @@ package testhelper
 
 import (
 	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/wuiscmc/ads/repositories"
+	_ "github.com/lib/pq"
 	"time"
 )
 
+var dbSession *sql.DB 
+
 func getDBSession() *sql.DB {
-	db, _ := sql.Open("sqlite3", "../ads_test.db")
-	return db
+	if dbSession == nil {
+		db, _ := sql.Open("postgres", "dbname=ads_test sslmode=disable")
+		repositories.SetDBSession(db)
+		dbSession = db
+	}
+	return dbSession
 }
 
-func SeedDB() {
+func CreateAd(title string, desc string, prio int, zone int) {
 	db := getDBSession()
-	defer db.Close()
-	db.Exec("INSERT INTO ads VALUES (?,?,?,?,?)", "1", "title1", "description1", 8, 1)
-	db.Exec("INSERT INTO ads VALUES (?,?,?,?,?)", "2", "title2", "description2", 9, 1)
-	db.Exec("INSERT INTO ads VALUES (?,?,?,?,?)", "3", "title3", "description3", 10, 1)
-	db.Exec("INSERT INTO ads VALUES (?,?,?,?,?)", "4", "title4", "description4", 10, 2)
-	db.Exec("INSERT INTO ads VALUES (?,?,?,?,?)", "5", "title5", "description5", 9, 3)
-}
-
-func CreateAd(id string, title string, desc string, prio int, zone int) {
-	db := getDBSession()
-	defer db.Close()
-	db.Exec("INSERT INTO ads VALUES (?,?,?,?,?)", id, title, desc, prio, zone)
+	db.Exec("INSERT INTO ads (title, description, priority, zone_id) VALUES ($1,$2,$3,$4)", title, desc, prio, zone)
 }
 
 func ResetDB() {
 	db := getDBSession()
-	defer db.Close()
-	db.Exec("DELETE FROM impressions")
-	db.Exec("DELETE FROM ads")
-}
-
-func NewAdRepository() *repositories.AdRepository {
-	adRepository := repositories.AdRepository{}
-	adRepository.SetSession(getDBSession())
-	return &adRepository
+	db.Exec("DELETE FROM impressions; DELETE FROM ads")
 }
 
 type Impression struct {
@@ -49,7 +36,6 @@ type Impression struct {
 
 func ListImpressions() []Impression {
 	db := getDBSession()
-	defer db.Close()
 	rows, _ := db.Query("SELECT * FROM impressions")
 	var impressions []Impression
 	for rows.Next() {
