@@ -13,10 +13,18 @@ type Ad struct {
 	Title       string
 	Description string
 	Priority    string
-	ZoneField   string
+	ZoneId      string
 	MediaFiles  []Media
+}
+
+func NullAd() Ad {
+	return Ad{Id: 0, Title: "", Description: "", Priority: "", ZoneId: "", MediaFiles: nil}
 }
 
 func (ad *Ad) SetMediaFiles(mediaFiles []Media) {
 	ad.MediaFiles = mediaFiles
+}
+
+func (ad Ad) IsNully() bool {
+	return ad.Id == 0
 }

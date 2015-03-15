@@ -3,6 +3,7 @@ package repositories
 import (
 	_ "github.com/lib/pq"
 	"github.com/wuiscmc/ads/models"
+	"database/sql"
 )
 
 type AdRepository struct{}
@@ -24,7 +25,10 @@ func FetchAdFromDB(zoneId int) models.Ad {
 	db := GetDBSession()
 	ad := models.Ad{}
 	row := db.QueryRow("SELECT * FROM ads WHERE zone_id = $1 ORDER BY priority DESC LIMIT 1", zoneId)
-	row.Scan(&ad.Id, &ad.Title, &ad.Description, &ad.Priority, &ad.ZoneField)
+	err := row.Scan(&ad.Id, &ad.Title, &ad.Description, &ad.Priority, &ad.ZoneId)
+	if err == sql.ErrNoRows {
+		ad = models.NullAd()
+	}
 	return ad
 }
 

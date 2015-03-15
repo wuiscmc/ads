@@ -10,7 +10,9 @@ import (
 	"text/template"
 )
 
-var Logger = log.New(os.Stdout, "[SERVER]", 0)
+var logger = log.New(os.Stdout, "[SERVER]", 0)
+
+var adController = controllers.NewAdController()
 
 type Response struct {
 	models.Ad
@@ -18,27 +20,31 @@ type Response struct {
 }
 
 func main() {
-
 	router := httprouter.New()
-	adController := controllers.NewAdController()
+	router.GET(v1("/ads/:zoneId"), fetchAdHandler)
+	router.POST(v1("/track"), trackEventHandler)
+	http.ListenAndServe(":3000", router)
+}
 
-	router.GET(v1("/ads/:zoneId"), func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		logRequest(r)
-		ad := adController.FindAd(ps.ByName("zoneId"))
+func fetchAdHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	logRequest(r)
+	ad := adController.FindAd(ps.ByName("zoneId"))
+	if ad.Id == 0 {
+		w.WriteHeader(404)
+	} else {
 		tmpl, _ := template.ParseFiles("templates/advast2.tmpl")
 		w.Header().Set("Content-Type", "application/xml")
 		tmpl.Execute(w, Response{ad, string("http://localhost:3000/v1")})
-	})
+	}
+}
 
-	router.POST(v1("/track"), func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		logRequest(r)
-		query := r.URL.Query()
-		id := query.Get("uid")
-		action := query.Get("action")
-		adController.TrackEvent(id, action)
-		w.WriteHeader(204)
-	})
-	http.ListenAndServe(":3000", router)
+func trackEventHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	logRequest(r)
+	query := r.URL.Query()
+	id := query.Get("uid")
+	action := query.Get("action")
+	adController.TrackEvent(id, action)
+	w.WriteHeader(204)
 }
 
 func v1(route string) string {
@@ -46,5 +52,5 @@ func v1(route string) string {
 }
 
 func logRequest(r *http.Request) {
-	Logger.Printf(" %s %s", r.Method, r.URL.Path)
+	logger.Printf(" %s %s", r.Method, r.URL.Path)
 }
