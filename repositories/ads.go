@@ -1,32 +1,45 @@
 package repositories
 
 import (
-	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 	"github.com/wuiscmc/ads/models"
 )
 
-type AdRepository struct {
-	session *sql.DB
-}
+type AdRepository struct{}
 
-func (ar *AdRepository) SetSession(db *sql.DB) {
-	ar.session = db
-}
-
-func NewAdRepository() *AdRepository {
-	return &AdRepository{getDBSession()}
-}
-
-func (ar AdRepository) FetchAd(zoneId string) models.Ad {
-	ad := models.Ad{}
-	row := ar.session.QueryRow("SELECT * FROM ads WHERE zoneField = ? ORDER BY priority DESC LIMIT 1", zoneId)
-	err := row.Scan(&ad.Id, &ad.Title, &ad.Description, &ad.Priority, &ad.ZoneField)
-	checkErr(err)
+func (ar AdRepository) FetchAd(zoneId int) models.Ad {
+	ad := FetchAdFromDB(zoneId)
+	medias := FetchAdMediaFromDB(ad.Id)
+	ad.SetMediaFiles(medias)
 	return ad
 }
 
-func (ar AdRepository) LogImpression(id string) {
-	_, err := ar.session.Exec("INSERT INTO impressions (ad_id) values(?)", id)
+func (ar AdRepository) LogImpression(adId int) {
+	db := GetDBSession()
+	_, err := db.Exec("INSERT INTO impressions (ad_id) VALUES ($1)", adId)
 	checkErr(err)
+}
+
+func FetchAdFromDB(zoneId int) models.Ad {
+	db := GetDBSession()
+	ad := models.Ad{}
+	row := db.QueryRow("SELECT * FROM ads WHERE zone_id = $1 ORDER BY priority DESC LIMIT 1", zoneId)
+	row.Scan(&ad.Id, &ad.Title, &ad.Description, &ad.Priority, &ad.ZoneField)
+	return ad
+}
+
+func FetchAdMediaFromDB(adId int) []models.Media {
+	db := GetDBSession()
+	rows, err := db.Query("SELECT * FROM ad_media WHERE ad_id = $1", adId)
+	checkErr(err)
+	 var mediaFiles []models.Media
+	for rows.Next() {
+		var file models.Media
+		var id, aid int
+		err = rows.Scan(&id, &aid, &file.Type, &file.Width, &file.Height, &file.Delivery, &file.Url)
+		checkErr(err)
+		mediaFiles = append(mediaFiles, file)
+	}
+	rows.Close()
+	 return mediaFiles
 }
