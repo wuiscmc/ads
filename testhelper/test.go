@@ -2,12 +2,16 @@ package testhelper
 
 import (
 	"database/sql"
-	"github.com/wuiscmc/ads/repositories"
 	_ "github.com/lib/pq"
+	"github.com/wuiscmc/ads/repositories"
 	"time"
 )
 
-var dbSession *sql.DB 
+var dbSession *sql.DB
+
+func SetTestMode() {
+	getDBSession()
+}
 
 func getDBSession() *sql.DB {
 	if dbSession == nil {
@@ -25,12 +29,12 @@ func CreateAd(title string, desc string, prio int, zone int) {
 
 func ResetDB() {
 	db := getDBSession()
-	db.Exec("DELETE FROM impressions; DELETE FROM ads")
+	db.Exec("DELETE FROM impressions; DELETE FROM ads; DELETE FROM events")
 }
 
 type Impression struct {
 	Id        int
-	AdId      string
+	AdId      int
 	Timestamp time.Time
 }
 
@@ -45,4 +49,19 @@ func ListImpressions() []Impression {
 	}
 	rows.Close()
 	return impressions
+}
+
+type Event struct {
+	AdId   int
+	Action string
+}
+
+func FetchLastEventTracked() Event {
+	db := getDBSession()
+	row := db.QueryRow("SELECT * FROM events ORDER BY time DESC LIMIT 1")
+	var event Event
+	var time time.Time
+	var id int
+	row.Scan(&id, &event.AdId, &event.Action, &time)
+	return event
 }
