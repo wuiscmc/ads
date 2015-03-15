@@ -20,7 +20,12 @@ func SeedDB() {
 	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "3", "title3", "description3", 10, 1)
 	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "4", "title4", "description4", 10, 2)
 	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "5", "title5", "description5", 9, 3)
-	db.Exec("INSERT INTO ads values (?,?,?,?,?)", "6", "title6", "description6", 8, 2)
+}
+
+func CreateAd(id string, title string, desc string, prio int, zone int) {
+	db := getDBSession()
+	defer db.Close()
+	db.Exec("insert into ads values (?,?,?,?,?)", id, title, desc, prio, zone)
 }
 
 func ResetDB() {
