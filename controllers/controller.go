@@ -23,7 +23,8 @@ func (ac AdController) FindAd(zoneId string) models.Ad {
 }
 
 func (ac AdController) TrackEvent(adId string, action string) bool {
-	err := ac.EventRepository.LogEvent(adId, action)
+	aid, _ := strconv.Atoi(adId)
+	err := ac.EventRepository.LogEvent(aid, action)
 	return err
 }
 
