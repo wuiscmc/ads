@@ -6,18 +6,25 @@ import (
 )
 
 type AdController struct {
-	adRepository *repositories.AdRepository
+	*repositories.AdRepository
+	*repositories.EventRepository
 }
 
-func NewAdController(adRepository *repositories.AdRepository) *AdController {
-	return &AdController{adRepository}
+func NewAdController(ar *repositories.AdRepository) *AdController {
+	return &AdController{ar, &repositories.EventRepository{}}
 }
 
 func (ac AdController) FindAd(zoneId string) models.Ad {
-	ad := ac.adRepository.FetchAd(zoneId)
-	ac.adRepository.LogImpression(ad.Id)
+	ad := ac.AdRepository.FetchAd(zoneId)
+	ac.AdRepository.LogImpression(ad.Id)
 	return ad
 }
 
-func (ac AdController) Track() {
+func (ac AdController) TrackEvent(adId string, action string) bool {
+	err := ac.EventRepository.LogEvent(adId, action)
+	return err
+}
+
+func (ac AdController) SetAdRepository(adRepository *repositories.AdRepository) {
+	ac.AdRepository = adRepository
 }
