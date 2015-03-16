@@ -23,7 +23,7 @@ func main() {
 	router := httprouter.New()
 	router.GET(v1("/ads/:zoneId"), fetchAdHandler)
 	router.POST(v1("/track"), trackEventHandler)
-	http.ListenAndServe(":3000", router)
+	http.ListenAndServe(getPort(), router)
 }
 
 func fetchAdHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -53,4 +53,13 @@ func v1(route string) string {
 
 func logRequest(r *http.Request) {
 	logger.Printf(" %s %s", r.Method, r.URL.Path)
+}
+
+func getPort() string {
+	var port = os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+		logger.Printf("Defaulting to port " + port)
+	}
+	return ":" + port
 }

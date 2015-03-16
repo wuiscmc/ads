@@ -1,12 +1,14 @@
 language: go
-
 go:
-  - 1.3
-  - tip
-
+- 1.3
+- tip
 addons:
-  postgresql: "9.3"
-
+  postgresql: '9.3'
 before_script:
-  - psql -c 'create database ads_test;' -U postgres
-  - psql -U postgres -d ads_test -a -f seed.sql
+- psql -c 'create database ads_test;' -U postgres
+- psql -U postgres -d ads_test -a -f seed.sql
+deploy:
+  provider: heroku
+  app: ads-api-test
+  api_key:
+    secure: BpJBqpZ1qlrkE7kurGedjEY7LGkqhFl0EUz0OGO63PDSwj6QfU1kBkw9kmNPNfo7wbaO4i9WgfB9fvAMxK5cbNennmdQ2Tv5yRHnozMP1C15XqjBzcbLAHjANfILVi1YKfaNHCenMV7fhT8YN4tvU3OWzbSst0u3UAxcrvZdb1M=
