@@ -29,12 +29,13 @@ func main() {
 func fetchAdHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	logRequest(r)
 	ad := adController.FindAd(ps.ByName("zoneId"))
+	setCorsHeaders(w)
 	if ad.Id == 0 {
 		w.WriteHeader(404)
 	} else {
 		tmpl, _ := template.ParseFiles("templates/advast2.tmpl")
 		w.Header().Set("Content-Type", "application/xml")
-		tmpl.Execute(w, Response{ad, string("http://localhost:3000/v1")})
+		tmpl.Execute(w, Response{ad, string(getHost() + "/v1")})
 	}
 }
 
@@ -44,7 +45,15 @@ func trackEventHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	id := query.Get("uid")
 	action := query.Get("action")
 	adController.TrackEvent(id, action)
+	setCorsHeaders(w)
 	w.WriteHeader(204)
+}
+
+func setCorsHeaders(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers",
+		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 }
 
 func v1(route string) string {
@@ -62,4 +71,12 @@ func getPort() string {
 		logger.Printf("Defaulting to port " + port)
 	}
 	return ":" + port
+}
+
+func getHost() string {
+	if os.Getenv("ENV") == "production" {
+		return os.Getenv("HOSTNAME")
+	} else {
+		return "http://localhost:3000"
+	}
 }
