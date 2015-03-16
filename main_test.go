@@ -10,7 +10,6 @@ import (
 )
 
 func TestFetchAdHandler(t *testing.T) {
-	testhelper.SetTestMode()
 	testhelper.CreateAd("test", "testFetchAdHandler", 1, 1)
 
 	req, _ := http.NewRequest("GET", "http://whatever.com/ads/1", nil)
@@ -28,8 +27,6 @@ func TestFetchAdHandler(t *testing.T) {
 }
 
 func TestFetchAdHandlerUnexistingZone(t *testing.T) {
-	testhelper.SetTestMode()
-
 	req, _ := http.NewRequest("GET", "http://whatever.com/ads/1", nil)
 	w := httptest.NewRecorder()
 	fetchAdHandler(w, req, httprouter.Params{httprouter.Param{"zoneId", "1231"}})
