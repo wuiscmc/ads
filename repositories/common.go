@@ -27,7 +27,7 @@ func checkErr(err error) {
 	}
 }
 
-func getDBParameters() {
+func getDBParameters() string {
 	switch os.Getenv("ENV") {
 	case "production":
 		return os.Getenv("DATABASE_URL")
